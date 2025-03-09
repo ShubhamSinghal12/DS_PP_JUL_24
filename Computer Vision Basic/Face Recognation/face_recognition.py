@@ -13,6 +13,7 @@
 import cv2
 import numpy as np 
 import os 
+from sklearn.neighbors import KNeighborsClassifier
 
 ########## KNN CODE ############
 def distance(v1, v2):
@@ -73,13 +74,17 @@ for fx in os.listdir(dataset_path):
 		labels.append(target)
 
 face_dataset = np.concatenate(face_data,axis=0)
-face_labels = np.concatenate(labels,axis=0).reshape((-1,1))
+face_labels = np.concatenate(labels,axis=0)
 
 print(face_dataset.shape)
 print(face_labels.shape)
+print(names)
 
-trainset = np.concatenate((face_dataset,face_labels),axis=1)
-print(trainset.shape)
+clf = KNeighborsClassifier(5)
+clf.fit(face_dataset,face_labels)
+
+# trainset = np.concatenate((face_dataset,face_labels),axis=1)
+# print(trainset.shape)
 
 # Testing 
 
@@ -101,10 +106,10 @@ while True:
 		face_section = cv2.resize(face_section,(100,100))
 
 		#Predicted Label (out)
-		out = knn(trainset,face_section.flatten())
+		out = clf.predict([face_section.flatten()])
 
 		#Display on the screen the name and rectangle around it
-		pred_name = names[int(out)]
+		pred_name = names[int(out[0])]
 		cv2.putText(frame,pred_name,(x,y-10),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2,cv2.LINE_AA)
 		cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,255),2)
 
